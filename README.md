@@ -1,7 +1,6 @@
 # Golang Rocket Chat REST API client
 
-Use this simple client if you need to connect to Rocket Chat 
-in Golang.
+This is a quick fork from [github.com/badkaktus/gorocket](https://github.com/badkaktus/gorocket) to support the `tmid` parameter for threads and `chat.sendMessage` (instead of `chat.postMessage`) which has some slight differences to how multiple messages visually appear.
 
 ## How to use
 
@@ -9,7 +8,7 @@ Just import
 
 ```go
 import (
-	"github.com/badkaktus/gorocket"
+	"github.com/AndrewChau/gorocket"
 )
 ```
 
@@ -74,6 +73,32 @@ fmt.Printf("Channel was created %t", channel.Success)
 str := gorocket.Message{
     Channel:     "somechannel",
     Text:        "Hey! This is new message from Golang REST Client",
+}
+
+msg, err := client.PostMessage(&str)
+if err != nil {
+    fmt.Printf("Error: %+v", err)
+}
+fmt.Printf("Message was posted %t", msg.Success)
+```
+
+## Send a message
+```go
+// create a new channel
+str := gorocket.CreateChannelRequest{
+    Name:     "newchannel",
+}
+
+channel, err := client.CreateChannel(&str)
+if err != nil {
+    fmt.Printf("Error: %+v", err)
+}
+fmt.Printf("Channel was created %t", channel.Success)
+// send a message
+str := gorocket.FocusedMessage{
+    RoomID:     "(enter room ID)",
+    TmID:       "(optional, enter thread ID)",
+    Text:       "Hey! This is new message from Golang REST Client",
 }
 
 msg, err := client.PostMessage(&str)

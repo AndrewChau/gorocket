@@ -15,7 +15,23 @@ type Message struct {
 	Channel     string       `json:"channel,omitempty"`
 	Emoji       string       `json:"emoji,omitempty"`
 	RoomID      string       `json:"roomId,omitempty"`
+	TmID        string       `json:"tmid,omitempty"`
 	Text        string       `json:"text"`
+	Attachments []Attachment `json:"attachments"`
+}
+
+type SendMessageEnvelope struct {
+	Message	    FocusedMessage `json:"message"`
+}
+type FocusedMessage struct {
+	ID          string       `json:"_id,omitempty"`
+	Alias       string       `json:"alias,omitempty"`
+	Emoji       string       `json:"emoji,omitempty"`
+	Avatar      string       `json:"avatar,omitempty"`
+	RoomID      string       `json:"rid"`
+	TmID        string       `json:"tmid,omitempty"`
+	Text        string       `json:"msg"`
+	TShow        bool        `json:"tshow,omitempty"`
 	Attachments []Attachment `json:"attachments"`
 }
 
@@ -167,6 +183,30 @@ func (c *Client) PostMessage(msg *Message) (*RespPostMessage, error) {
 
 	req, err := http.NewRequest("POST",
 		fmt.Sprintf("%s/%s/chat.postMessage", c.baseURL, c.apiVersion),
+		bytes.NewBuffer(opt))
+
+	if err != nil {
+		return nil, err
+	}
+
+	res := RespPostMessage{}
+
+	if err := c.sendRequest(req, &res); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+
+// Sends a new chat message.
+func (c *Client) SendMessage(msg *FocusedMessage) (*RespPostMessage, error) {
+
+	msgEnvelope := SendMessageEnvelope{Message: *msg}
+	opt, _ := json.Marshal(&msgEnvelope)
+
+	req, err := http.NewRequest("POST",
+		fmt.Sprintf("%s/%s/chat.sendMessage", c.baseURL, c.apiVersion),
 		bytes.NewBuffer(opt))
 
 	if err != nil {

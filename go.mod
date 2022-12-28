@@ -1,4 +1,4 @@
-module github.com/badkaktus/gorocket
+module github.com/AndrewChau/gorocket
 
 go 1.13
 
